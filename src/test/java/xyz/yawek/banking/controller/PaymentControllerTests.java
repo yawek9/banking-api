@@ -20,6 +20,7 @@ package xyz.yawek.banking.controller;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpMethod;
 import org.springframework.test.annotation.DirtiesContext;
@@ -32,6 +33,7 @@ import java.util.Map;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @DirtiesContext
+@Order(2)
 public class PaymentControllerTests extends BaseTest {
 
     @Test
@@ -46,7 +48,7 @@ public class PaymentControllerTests extends BaseTest {
                 status().is(200));
 
         String token = jsonMapper.readTree(result.getResponse().getContentAsString())
-                .get("token").textValue();
+                .get("accessToken").textValue();
 
         userRepository.findByEmail("example@example.com")
                 .ifPresent(user -> {
@@ -81,7 +83,7 @@ public class PaymentControllerTests extends BaseTest {
                 null, jsonUser.toString(), status().is(200));
 
         String token = jsonMapper.readTree(loginResult.getResponse().getContentAsString())
-                .get("token").textValue();
+                .get("accessToken").textValue();
 
         userRepository.findByEmail("example@example.com")
                 .ifPresent(user -> {

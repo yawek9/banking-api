@@ -18,15 +18,17 @@
 
 package xyz.yawek.banking.model.rest;
 
-import lombok.AllArgsConstructor;
 import lombok.Data;
 
-@Data
-@AllArgsConstructor
-public class TokenResponse {
+import javax.validation.constraints.NotBlank;
 
-    private String accessToken;
+@Data
+public class RefreshTokenRequest {
+
+    @NotBlank
     private String refreshToken;
+
+    @NotBlank
     private String email;
 
 }

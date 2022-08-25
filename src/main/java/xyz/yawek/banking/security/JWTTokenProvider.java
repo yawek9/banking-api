@@ -33,19 +33,22 @@ public class JWTTokenProvider {
     private String secret;
 
     @Value("${app.token.expiration}")
-    private long expiration;
+    private long tokenExpiration;
 
-    public String createToken(String username) {
-        return JWT.create()
-                .withIssuer(username)
-                .withIssuedAt(Instant.ofEpochMilli(System.currentTimeMillis()))
-                .withExpiresAt(Instant.ofEpochMilli(System.currentTimeMillis() + expiration * 1000))
-                .sign(Algorithm.HMAC256(secret));
+    @Value("${app.refresh-token.expiration}")
+    private long refreshTokenExpiration;
+
+    public String createAccessToken(String username) {
+        return createToken(username, tokenExpiration);
+    }
+
+    public String createRefreshToken(String username) {
+        return createToken(username, refreshTokenExpiration);
     }
 
     /**
      * Validates provided token
-     * @param token encrypted token string
+     * @param token token string
      * @return true if token is valid, false otherwise
      */
     public boolean validateToken(String token) {
@@ -60,6 +63,15 @@ public class JWTTokenProvider {
 
     public String getUsername(String token) {
         return JWT.decode(token).getIssuer();
+    }
+
+    private String createToken(String username, long expiration) {
+        return JWT.create()
+                .withIssuer(username)
+                .withIssuedAt(Instant.ofEpochMilli(System.currentTimeMillis()))
+                .withExpiresAt(Instant.ofEpochMilli(
+                        System.currentTimeMillis() + expiration * 1000))
+                .sign(Algorithm.HMAC256(secret));
     }
 
 }

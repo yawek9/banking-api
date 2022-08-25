@@ -28,12 +28,16 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import xyz.yawek.banking.model.RefreshToken;
 import xyz.yawek.banking.model.User;
+import xyz.yawek.banking.model.rest.RefreshTokenRequest;
 import xyz.yawek.banking.model.rest.TokenResponse;
+import xyz.yawek.banking.service.RefreshTokenService;
 import xyz.yawek.banking.service.TokenService;
 import xyz.yawek.banking.service.UserService;
 
 import javax.validation.Valid;
+import java.util.Optional;
 import java.util.Set;
 
 @RestController
@@ -44,6 +48,7 @@ public class AuthController {
     private final UserService userService;
     private final AuthenticationManager authenticationManager;
     private final TokenService tokenService;
+    private final RefreshTokenService refreshTokenService;
 
     @SuppressWarnings("unused")
     @PostMapping("/register")
@@ -57,14 +62,32 @@ public class AuthController {
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody @Valid User user) {
         try {
+            User persistentUser = userService.loadByEmail(user.getEmail());
             authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(user.getEmail(), user.getPassword()));
             return ResponseEntity.ok(new TokenResponse(
-                    tokenService.getToken(user.getEmail()),
+                    tokenService.createToken(persistentUser),
+                    refreshTokenService.createNewToken(persistentUser).getToken(),
                     user.getEmail()));
         } catch (BadCredentialsException e) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
+    }
+
+    @SuppressWarnings("unused")
+    @PostMapping("/refresh-token")
+    public ResponseEntity<?> refreshToken(
+            @RequestBody @Valid RefreshTokenRequest refreshTokenRequest) {
+        Optional<RefreshToken> tokenOptional = refreshTokenService.validateTokenAndIssueNew(
+                refreshTokenRequest.getEmail(), refreshTokenRequest.getRefreshToken());
+        if (tokenOptional.isEmpty())
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+        User user = userService.loadByEmail(refreshTokenRequest.getEmail());
+        TokenResponse tokenResponse = new TokenResponse(
+                tokenService.createToken(user),
+                tokenOptional.get().getToken(),
+                refreshTokenRequest.getEmail());
+        return ResponseEntity.ok(tokenResponse);
     }
 
 }

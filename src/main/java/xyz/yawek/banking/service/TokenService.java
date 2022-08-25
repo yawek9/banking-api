@@ -20,6 +20,7 @@ package xyz.yawek.banking.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import xyz.yawek.banking.model.User;
 import xyz.yawek.banking.security.JWTTokenProvider;
 
 @Service
@@ -28,8 +29,8 @@ public class TokenService {
 
     private final JWTTokenProvider tokenProvider;
 
-    public String getToken(String username) {
-        return tokenProvider.createToken(username);
+    public String createToken(User user) {
+        return tokenProvider.createAccessToken(user.getEmail());
     }
 
 }

@@ -16,17 +16,20 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package xyz.yawek.banking.model.rest;
+package xyz.yawek.banking.repository;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
+import org.springframework.data.repository.CrudRepository;
+import org.springframework.stereotype.Repository;
+import xyz.yawek.banking.model.RefreshToken;
+import xyz.yawek.banking.model.User;
 
-@Data
-@AllArgsConstructor
-public class TokenResponse {
+import java.util.Optional;
 
-    private String accessToken;
-    private String refreshToken;
-    private String email;
+@Repository
+public interface RefreshTokenRepository extends CrudRepository<RefreshToken, Long> {
+
+    Optional<RefreshToken> findByUser(User user);
+
+    Optional<RefreshToken> findByToken(String token);
 
 }
