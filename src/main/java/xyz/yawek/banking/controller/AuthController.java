@@ -32,6 +32,7 @@ import xyz.yawek.banking.model.RefreshToken;
 import xyz.yawek.banking.model.User;
 import xyz.yawek.banking.model.rest.RefreshTokenRequest;
 import xyz.yawek.banking.model.rest.TokenResponse;
+import xyz.yawek.banking.model.rest.UserRequest;
 import xyz.yawek.banking.service.RefreshTokenService;
 import xyz.yawek.banking.service.TokenService;
 import xyz.yawek.banking.service.UserService;
@@ -52,7 +53,8 @@ public class AuthController {
 
     @SuppressWarnings("unused")
     @PostMapping("/register")
-    public ResponseEntity<?> register(@RequestBody @Valid User user) {
+    public ResponseEntity<?> register(@RequestBody @Valid UserRequest userRequest) {
+        User user = userService.buildFromRequest(userRequest);
         user.setRoles(Set.of("USER"));
         userService.registerUser(user);
         return ResponseEntity.ok().build();
@@ -60,14 +62,15 @@ public class AuthController {
 
     @SuppressWarnings("unused")
     @PostMapping("/login")
-    public ResponseEntity<?> login(@RequestBody @Valid User user) {
+    public ResponseEntity<?> login(@RequestBody @Valid UserRequest userRequest) {
         try {
-            User persistentUser = userService.loadByEmail(user.getEmail());
+            User user = userService.loadByEmail(userRequest.getEmail());
             authenticationManager.authenticate(
-                    new UsernamePasswordAuthenticationToken(user.getEmail(), user.getPassword()));
+                    new UsernamePasswordAuthenticationToken(user.getEmail(),
+                            userRequest.getPassword()));
             return ResponseEntity.ok(new TokenResponse(
-                    tokenService.createToken(persistentUser),
-                    refreshTokenService.createNewToken(persistentUser).getToken(),
+                    tokenService.createToken(user),
+                    refreshTokenService.createNewToken(user).getToken(),
                     user.getEmail()));
         } catch (BadCredentialsException e) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();

@@ -18,9 +18,8 @@
 
 package xyz.yawek.banking.model;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import javax.persistence.Column;
 import javax.persistence.ElementCollection;
@@ -30,39 +29,35 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.validation.constraints.Digits;
-import javax.validation.constraints.Email;
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.Size;
 import java.math.BigDecimal;
 import java.util.Set;
 
 @Entity(name = "users")
 @Data
+@NoArgsConstructor
 public class User {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @JsonIgnore
     private long id;
 
     @Column(unique = true)
-    @Email(regexp = ".+@.+\\..+")
-    @NotBlank
     private String email;
 
-    @NotBlank
-    @Size(min = 6)
-    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
-    private String password;
+    @Column(name = "password")
+    private String passwordHash;
 
     @ElementCollection(targetClass = String.class, fetch = FetchType.EAGER)
-    @JsonIgnore
     private Set<String> roles;
 
     @Digits(integer = 20, fraction = 2)
     @Column(nullable = false, columnDefinition = "decimal(22,2) default '0.00'")
-    @JsonIgnore
     private BigDecimal balance = BigDecimal.ZERO;
+
+    public User(String email, String passwordHash) {
+        this.email = email;
+        this.passwordHash = passwordHash;
+    }
 
     public void addBalance(BigDecimal amount) {
         balance = balance.add(amount);

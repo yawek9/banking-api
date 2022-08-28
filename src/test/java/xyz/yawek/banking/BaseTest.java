@@ -31,6 +31,7 @@ import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.ResultMatcher;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
 import xyz.yawek.banking.model.User;
+import xyz.yawek.banking.model.rest.UserRequest;
 import xyz.yawek.banking.repository.UserRepository;
 import xyz.yawek.banking.service.UserService;
 
@@ -69,9 +70,7 @@ public abstract class BaseTest {
     }
 
     private void registerUser(String email, String password) {
-        User user = new User();
-        user.setEmail(email);
-        user.setPassword(password);
+        User user = userService.buildFromRequest(new UserRequest(email, password));
         user.setRoles(Set.of("USER"));
         userService.registerUser(user);
     }

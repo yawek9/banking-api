@@ -21,7 +21,6 @@ package xyz.yawek.banking.security;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Lazy;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
@@ -34,7 +33,6 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
-import xyz.yawek.banking.service.UserService;
 
 import javax.servlet.http.HttpServletResponse;
 
@@ -43,15 +41,10 @@ import javax.servlet.http.HttpServletResponse;
 @EnableGlobalMethodSecurity(prePostEnabled = true)
 public class WebSecurityConfig {
 
-    @Lazy
-    private final UserService userService;
-
     private final JWTAuthenticationFilter authenticationFilter;
 
     @Autowired
-    public WebSecurityConfig(@Lazy UserService userService,
-                             JWTAuthenticationFilter authenticationFilter) {
-        this.userService = userService;
+    public WebSecurityConfig(JWTAuthenticationFilter authenticationFilter) {
         this.authenticationFilter = authenticationFilter;
     }
 

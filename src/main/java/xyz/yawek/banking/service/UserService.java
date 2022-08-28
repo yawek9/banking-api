@@ -25,6 +25,7 @@ import org.springframework.transaction.annotation.Transactional;
 import xyz.yawek.banking.exception.EmailConflictException;
 import xyz.yawek.banking.exception.UserNotFoundException;
 import xyz.yawek.banking.model.User;
+import xyz.yawek.banking.model.rest.UserRequest;
 import xyz.yawek.banking.repository.UserRepository;
 
 import java.util.Optional;
@@ -45,7 +46,6 @@ public class UserService {
     public void registerUser(User user) {
         if (userRepository.findByEmail(user.getEmail()).isPresent())
             throw new EmailConflictException("Email already taken");
-        user.setPassword(passwordEncoder.encode(user.getPassword()));
         userRepository.save(user);
     }
 
@@ -53,6 +53,11 @@ public class UserService {
         Optional<User> userOptional = userRepository.findByEmail(email);
         if (userOptional.isEmpty()) throw new UserNotFoundException("User not found");
         return userOptional.get();
+    }
+
+    public User buildFromRequest(UserRequest userRequest) {
+        return new User(userRequest.getEmail(),
+                passwordEncoder.encode(userRequest.getPassword()));
     }
 
 }
