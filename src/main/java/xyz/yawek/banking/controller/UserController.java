@@ -19,52 +19,29 @@
 package xyz.yawek.banking.controller;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import xyz.yawek.banking.model.Payment;
-import xyz.yawek.banking.model.rest.PaymentRequest;
 import xyz.yawek.banking.model.User;
-import xyz.yawek.banking.service.PaymentService;
 import xyz.yawek.banking.service.UserService;
 
 @RestController
-@RequestMapping("/payment")
+@RequestMapping("/user")
 @RequiredArgsConstructor
-public class PaymentController {
+public class UserController {
 
     private final UserService userService;
-    private final PaymentService paymentService;
 
-    @SuppressWarnings("unused")
-    @PostMapping("/pay")
+    @GetMapping("/balance")
     @PreAuthorize("hasAuthority('USER')")
-    public ResponseEntity<?> pay(@RequestBody PaymentRequest payment) {
-        Authentication auth =
-                SecurityContextHolder.getContext().getAuthentication();
-
-        User sender = userService.loadByEmail(auth.getName());
-        User receiver = userService.loadByEmail(payment.getReceiverEmail());
-        paymentService.makePayment(sender, receiver, payment.getAmount());
-        return ResponseEntity.ok().build();
-    }
-
-    @SuppressWarnings("unused")
-    @GetMapping("/payments")
-    @PreAuthorize("hasAuthority('USER')")
-    public Page<Payment> payments(Pageable pageable) {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-
-        User user = userService.loadByEmail(authentication.getName());
-        return paymentService.getPageableByUser(pageable, user);
+    public ResponseEntity<?> balance() {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        User user = userService.loadByEmail(auth.getName());
+        return ResponseEntity.ok(user.getBalance());
     }
 
 }

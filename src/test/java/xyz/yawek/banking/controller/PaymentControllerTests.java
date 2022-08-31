@@ -33,22 +33,13 @@ import java.util.Map;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @DirtiesContext
-@Order(2)
+@Order(3)
 public class PaymentControllerTests extends BaseTest {
 
     @Test
     void testPay() throws Exception {
-        ObjectNode jsonUser = jsonMapper.createObjectNode();
-        jsonUser.put("email", "example@example.com");
-        jsonUser.put("password", "password");
-
-        MvcResult result = this.testJsonRequest(
-                HttpMethod.POST, "/auth/login",
-                null, jsonUser.toString(),
-                status().is(200));
-
-        String token = jsonMapper.readTree(result.getResponse().getContentAsString())
-                .get("accessToken").textValue();
+        String token = this.getToken(
+                "example@example.com", "password");
 
         userRepository.findByEmail("example@example.com")
                 .ifPresent(user -> {
@@ -75,15 +66,8 @@ public class PaymentControllerTests extends BaseTest {
 
     @Test
     void testPayments() throws Exception {
-        ObjectNode jsonUser = jsonMapper.createObjectNode();
-        jsonUser.put("email", "example@example.com");
-        jsonUser.put("password", "password");
-
-        MvcResult loginResult = this.testJsonRequest(HttpMethod.POST, "/auth/login",
-                null, jsonUser.toString(), status().is(200));
-
-        String token = jsonMapper.readTree(loginResult.getResponse().getContentAsString())
-                .get("accessToken").textValue();
+        String token = this.getToken(
+                "example@example.com", "password");
 
         userRepository.findByEmail("example@example.com")
                 .ifPresent(user -> {
@@ -99,12 +83,15 @@ public class PaymentControllerTests extends BaseTest {
                 Map.of("authorization", "Bearer " + token),
                 jsonPayment.toString(), status().is(200));
 
-        MvcResult paymentsResult = this.testJsonRequest(HttpMethod.GET, "/payment/payments",
+        MvcResult paymentsResult = this.testJsonRequest(
+                HttpMethod.GET, "/payment/payments",
                 Map.of("authorization", "Bearer " + token),
                 null, status().is(200));
 
-        JsonNode paymentsArray = jsonMapper.readTree(paymentsResult.getResponse().getContentAsString());
-        assert paymentsArray.get("content").get(0).get("amount").doubleValue() == 1.0;
+        JsonNode paymentsArray = jsonMapper.readTree(
+                paymentsResult.getResponse().getContentAsString());
+        assert paymentsArray.get("content").get(0).get("amount")
+                .doubleValue() == 1.0;
     }
 
 }

@@ -19,6 +19,7 @@
 package xyz.yawek.banking;
 
 import com.fasterxml.jackson.databind.json.JsonMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.TestInstance;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -99,6 +100,19 @@ public abstract class BaseTest {
         return mockMvc.perform(requestBuilder)
                 .andExpectAll(resultMatchers)
                 .andReturn();
+    }
+
+    protected String getToken(String email, String password) throws Exception {
+        ObjectNode jsonUser = jsonMapper.createObjectNode();
+        jsonUser.put("email", email);
+        jsonUser.put("password", password);
+
+        MvcResult result = this.testJsonRequest(
+                HttpMethod.POST, "/auth/login",
+                null, jsonUser.toString());
+
+        return jsonMapper.readTree(result.getResponse().getContentAsString())
+                .get("accessToken").textValue();
     }
 
 }
