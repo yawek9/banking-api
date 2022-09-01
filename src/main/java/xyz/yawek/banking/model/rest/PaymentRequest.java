@@ -21,8 +21,10 @@ package xyz.yawek.banking.model.rest;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 
+import javax.validation.constraints.DecimalMin;
 import javax.validation.constraints.Digits;
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 import java.math.BigDecimal;
 
 @Data
@@ -33,6 +35,8 @@ public class PaymentRequest {
     private String receiverEmail;
 
     @Digits(integer = 20, fraction = 2)
+    @DecimalMin(value = "0.01")
+    @NotNull
     private BigDecimal amount;
 
 }

@@ -36,6 +36,8 @@ import xyz.yawek.banking.model.User;
 import xyz.yawek.banking.service.PaymentService;
 import xyz.yawek.banking.service.UserService;
 
+import javax.validation.Valid;
+
 @RestController
 @RequestMapping("/payment")
 @RequiredArgsConstructor
@@ -47,7 +49,7 @@ public class PaymentController {
     @SuppressWarnings("unused")
     @PostMapping("/pay")
     @PreAuthorize("hasAuthority('USER')")
-    public ResponseEntity<?> pay(@RequestBody PaymentRequest payment) {
+    public ResponseEntity<?> pay(@RequestBody @Valid PaymentRequest payment) {
         Authentication auth =
                 SecurityContextHolder.getContext().getAuthentication();
 
