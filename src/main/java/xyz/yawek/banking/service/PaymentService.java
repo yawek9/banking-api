@@ -35,12 +35,10 @@ import java.math.BigDecimal;
 public class PaymentService {
 
     private final PaymentRepository repository;
-    private final UserService userService;
 
     @Autowired
-    public PaymentService(PaymentRepository repository, UserService userService) {
+    public PaymentService(PaymentRepository repository) {
         this.repository = repository;
-        this.userService = userService;
     }
 
     public void makePayment(User sender, User receiver, BigDecimal amount) {

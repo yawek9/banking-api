@@ -29,6 +29,8 @@ import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.web.servlet.MvcResult;
 import xyz.yawek.banking.BaseTest;
 
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -47,7 +49,7 @@ class AuthControllerTests extends BaseTest {
 		this.testJsonRequest(HttpMethod.POST, "/auth/register",
 				null, json.toString(), status().is(200));
 
-		assert userRepository.findByEmail("register@example.com").isPresent();
+		assertTrue(userRepository.findByEmail("register@example.com").isPresent());
 
 		// Test registration conflict
 		this.testJsonRequest(HttpMethod.POST, "/auth/register",
@@ -83,7 +85,7 @@ class AuthControllerTests extends BaseTest {
 	}
 
 	@Test
-	void testRefreshToken() throws Exception {
+	void testRefreshingToken() throws Exception {
 		ObjectNode loginJson = jsonMapper.createObjectNode();
 		loginJson.put("email", "example@example.com");
 		loginJson.put("password", "password");
@@ -111,7 +113,7 @@ class AuthControllerTests extends BaseTest {
 				.readTree(refreshTokenResult.getResponse().getContentAsString())
 				.get("refreshToken").textValue();
 
-		assert !refreshToken.equals(newRefreshToken);
+		assertNotEquals(refreshToken, newRefreshToken);
 	}
 
 }

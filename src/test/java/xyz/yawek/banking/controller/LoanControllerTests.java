@@ -27,72 +27,52 @@ import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.web.servlet.MvcResult;
 import xyz.yawek.banking.BaseTest;
 
-import java.math.BigDecimal;
 import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+@Order(4)
 @DirtiesContext
-@Order(3)
-public class PaymentControllerTests extends BaseTest {
+public class LoanControllerTests extends BaseTest {
 
     @Test
-    void testPay() throws Exception {
+    void testTakingLoan() throws Exception {
         String token = this.getToken(
                 "example@example.com", "password");
 
-        userRepository.findByEmail("example@example.com")
-                .ifPresent(user -> {
-                    user.setBalance(new BigDecimal("1.00"));
-                    userRepository.save(user);
-                });
+        ObjectNode jsonLoanRequest = jsonMapper.createObjectNode();
+        jsonLoanRequest.put("amount", 500);
 
-        // Test with correct payload
-        ObjectNode jsonPayment = jsonMapper.createObjectNode();
-        jsonPayment.put("receiver", "example2@example.com");
-        jsonPayment.put("amount", "1.00");
-
-        this.testJsonRequest(HttpMethod.POST, "/payment/pay",
+        this.testJsonRequest(HttpMethod.POST, "/loan/take",
                 Map.of("authorization", "Bearer " + token),
-                jsonPayment.toString(),
+                jsonLoanRequest.toString(),
                 status().is(200));
-
-        // Test when balance is not enough
-        this.testJsonRequest(HttpMethod.POST, "/payment/pay",
-                Map.of("authorization", "Bearer " + token),
-                jsonPayment.toString(),
-                status().is(400));
+        assertEquals(500.0, userService.loadByEmail("example@example.com")
+                .getBalance().doubleValue());
     }
 
     @Test
-    void testGettingPayments() throws Exception {
+    void testGettingLoans() throws Exception {
         String token = this.getToken(
                 "example@example.com", "password");
 
-        userRepository.findByEmail("example@example.com")
-                .ifPresent(user -> {
-                    user.setBalance(new BigDecimal("1.00"));
-                    userRepository.save(user);
-                });
+        ObjectNode jsonLoanRequest = jsonMapper.createObjectNode();
+        jsonLoanRequest.put("amount", 500);
 
-        ObjectNode jsonPayment = jsonMapper.createObjectNode();
-        jsonPayment.put("receiver", "example2@example.com");
-        jsonPayment.put("amount", "1.00");
-
-        this.testJsonRequest(HttpMethod.POST, "/payment/pay",
+        this.testJsonRequest(HttpMethod.POST, "/loan/take",
                 Map.of("authorization", "Bearer " + token),
-                jsonPayment.toString(), status().is(200));
+                jsonLoanRequest.toString(), status().is(200));
 
-        MvcResult paymentsResult = this.testJsonRequest(
-                HttpMethod.GET, "/payment/payments",
+        MvcResult loansResult = this.testJsonRequest(
+                HttpMethod.GET, "/loan/loans",
                 Map.of("authorization", "Bearer " + token),
                 null, status().is(200));
 
-        JsonNode paymentsArray = jsonMapper.readTree(
-                paymentsResult.getResponse().getContentAsString())
+        JsonNode loansArray = jsonMapper.readTree(
+                loansResult.getResponse().getContentAsString())
                 .get("content");
-        assertEquals(1.0, paymentsArray.get(paymentsArray.size() - 1)
+        assertEquals(500.0, loansArray.get(loansArray.size() - 1)
                 .get("amount").doubleValue());
     }
 

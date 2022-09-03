@@ -30,8 +30,10 @@ import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.OneToMany;
 import javax.validation.constraints.Digits;
 import java.math.BigDecimal;
+import java.util.List;
 import java.util.Set;
 
 @Entity(name = "users")
@@ -59,6 +61,10 @@ public class User {
     @Column(nullable = false, columnDefinition = "decimal(22,2) default '0.00'")
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private BigDecimal balance = BigDecimal.ZERO;
+
+    @OneToMany(mappedBy = "user")
+    @JsonIgnore
+    private List<Loan> loans;
 
     public User(String email, String passwordHash) {
         this.email = email;

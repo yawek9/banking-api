@@ -27,6 +27,7 @@ import xyz.yawek.banking.BaseTest;
 
 import java.util.Map;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @DirtiesContext
@@ -34,15 +35,15 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 public class UserControllerTests extends BaseTest {
 
     @Test
-    void testBalance() throws Exception {
+    void testGettingBalance() throws Exception {
         String token = this.getToken(
                 "example@example.com", "password");
         MvcResult balanceResult = testJsonRequest(
                 HttpMethod.GET, "/user/balance",
                 Map.of("authorization", "Bearer " + token),
                 null, status().is(200));
-        assert Double.parseDouble(balanceResult.getResponse()
-                .getContentAsString()) == 0.0;
+        assertEquals(0.0, Double.parseDouble(
+                balanceResult.getResponse().getContentAsString()));
     }
 
 }

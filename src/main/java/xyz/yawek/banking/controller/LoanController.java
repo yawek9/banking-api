@@ -19,30 +19,53 @@
 package xyz.yawek.banking.controller;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import xyz.yawek.banking.model.Loan;
 import xyz.yawek.banking.model.User;
+import xyz.yawek.banking.model.rest.LoanRequest;
+import xyz.yawek.banking.service.LoanService;
 import xyz.yawek.banking.service.UserService;
 
+import javax.validation.Valid;
+
 @RestController
-@RequestMapping("/user")
+@RequestMapping("/loan")
 @RequiredArgsConstructor
-public class UserController {
+public class LoanController {
 
     private final UserService userService;
+    private final LoanService loanService;
 
     @SuppressWarnings("unused")
-    @GetMapping("/balance")
+    @PostMapping("/take")
     @PreAuthorize("hasAuthority('USER')")
-    public ResponseEntity<?> balance() {
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        User user = userService.loadByEmail(auth.getName());
-        return ResponseEntity.ok(user.getBalance());
+    public ResponseEntity<?> takeLoan(@RequestBody @Valid LoanRequest loanRequest) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+
+        User user = userService.loadByEmail(authentication.getName());
+        loanService.createLoan(loanService.buildFromUserRequest(user, loanRequest));
+
+        return ResponseEntity.ok().build();
+    }
+
+    @SuppressWarnings("unused")
+    @GetMapping("/loans")
+    @PreAuthorize("hasAuthority('USER')")
+    public Page<Loan> loans(Pageable pageable) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+
+        User user = userService.loadByEmail(authentication.getName());
+        return loanService.getLoansByUser(user, pageable);
     }
 
 }
