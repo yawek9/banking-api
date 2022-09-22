@@ -46,13 +46,13 @@ public class Loan {
 
     private BigDecimal repaymentAmount;
 
-    @JsonFormat(pattern="yyyy-MM-dd HH:mm:ss")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime repaymentDate;
 
     private boolean repaid = false;
 
     @ManyToOne
-    @JoinColumn(name="user_id")
+    @JoinColumn(name = "user_id")
     @JsonIgnore
     private User user;
 

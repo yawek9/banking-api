@@ -57,7 +57,7 @@ public class Payment {
     private BigDecimal amount;
 
     @CreationTimestamp
-    @JsonFormat(pattern="yyyy-MM-dd HH:mm:ss")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime timestamp;
 
     public Payment(User sender, User receiver, BigDecimal amount) {
