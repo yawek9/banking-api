@@ -59,6 +59,19 @@ public class WebSecurityConfig {
         };
     }
 
+//    @Bean
+//    public WebMvcConfigurer resourceHandlerConfigurer() {
+//        return new WebMvcConfigurer() {
+//            @Override
+//            public void addResourceHandlers(ResourceHandlerRegistry registry) {
+//                registry.addResourceHandler("swagger-ui.html")
+//                        .addResourceLocations("classpath:/META-INF/resources/");
+//                registry.addResourceHandler("/webjars/**")
+//                        .addResourceLocations("classpath:/META-INF/resources/webjars/");
+//            }
+//        };
+//    }
+
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity httpSecurity) throws Exception {
         return httpSecurity
@@ -66,6 +79,8 @@ public class WebSecurityConfig {
                 .csrf().disable()
                 .authorizeHttpRequests()
                 .antMatchers("/auth/**").permitAll()
+                .antMatchers("/docs/**").permitAll()
+                .antMatchers("/swagger-ui/**").permitAll()
                 .anyRequest().authenticated()
                 .and()
                 .exceptionHandling()

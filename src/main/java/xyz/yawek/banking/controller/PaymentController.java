@@ -18,6 +18,10 @@
 
 package xyz.yawek.banking.controller;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -31,8 +35,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import xyz.yawek.banking.model.Payment;
-import xyz.yawek.banking.model.rest.PaymentRequest;
 import xyz.yawek.banking.model.User;
+import xyz.yawek.banking.model.rest.PaymentRequest;
 import xyz.yawek.banking.service.PaymentService;
 import xyz.yawek.banking.service.UserService;
 
@@ -47,6 +51,17 @@ public class PaymentController {
     private final PaymentService paymentService;
 
     @SuppressWarnings("unused")
+    @Operation(summary = "Send payment")
+    @ApiResponses({
+            @ApiResponse(
+                    responseCode = "400",
+                    description = "Not enough balance",
+                    content = @Content),
+            @ApiResponse(
+                    responseCode = "401",
+                    description = "User did not send token or sent token is expired",
+                    content = @Content)
+    })
     @PostMapping("/pay")
     @PreAuthorize("hasAuthority('USER')")
     public ResponseEntity<?> pay(@RequestBody @Valid PaymentRequest payment) {
@@ -60,6 +75,16 @@ public class PaymentController {
     }
 
     @SuppressWarnings("unused")
+    @Operation(summary = "Get all user's received and sent payments")
+    @ApiResponses({
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "Loans"),
+            @ApiResponse(
+                    responseCode = "401",
+                    description = "User did not send token or sent token is expired",
+                    content = @Content)
+    })
     @GetMapping("/payments")
     @PreAuthorize("hasAuthority('USER')")
     public Page<Payment> payments(Pageable pageable) {

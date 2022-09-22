@@ -18,6 +18,10 @@
 
 package xyz.yawek.banking.controller;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -47,6 +51,15 @@ public class LoanController {
     private final LoanService loanService;
 
     @SuppressWarnings("unused")
+    @Operation(summary = "Take a loan")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Loan taken", content = @Content),
+            @ApiResponse(responseCode = "423", description = "Loan limit exceeded", content = @Content),
+            @ApiResponse(
+                    responseCode = "401",
+                    description = "User did not send token or sent token is expired",
+                    content = @Content)
+    })
     @PostMapping("/take")
     @PreAuthorize("hasAuthority('USER')")
     public ResponseEntity<?> takeLoan(@RequestBody @Valid LoanRequest loanRequest) {
@@ -59,6 +72,16 @@ public class LoanController {
     }
 
     @SuppressWarnings("unused")
+    @Operation(summary = "Get all user's loans")
+    @ApiResponses({
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "Loans"),
+            @ApiResponse(
+                    responseCode = "401",
+                    description = "User did not send token or sent token is expired",
+                    content = @Content)
+    })
     @GetMapping("/loans")
     @PreAuthorize("hasAuthority('USER')")
     public Page<Loan> loans(Pageable pageable) {

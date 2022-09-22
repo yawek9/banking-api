@@ -18,6 +18,7 @@
 
 package xyz.yawek.banking.model.rest;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 import xyz.yawek.banking.validation.LoanAmount;
 
@@ -28,6 +29,10 @@ public class LoanRequest {
 
     @NotNull
     @LoanAmount
+    @Schema(description =
+            "Must be divisible by 500, " +
+            "greater or equal to 500, " +
+            "lest or equal than 1000000")
     private long amount;
 
 }

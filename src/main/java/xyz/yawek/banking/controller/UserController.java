@@ -18,6 +18,10 @@
 
 package xyz.yawek.banking.controller;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -37,6 +41,13 @@ public class UserController {
     private final UserService userService;
 
     @SuppressWarnings("unused")
+    @Operation(summary = "Get user's balance")
+    @ApiResponses({
+            @ApiResponse(
+                    responseCode = "401",
+                    description = "User did not send token or sent token is expired",
+                    content = @Content)
+    })
     @GetMapping("/balance")
     @PreAuthorize("hasAuthority('USER')")
     public ResponseEntity<?> balance() {

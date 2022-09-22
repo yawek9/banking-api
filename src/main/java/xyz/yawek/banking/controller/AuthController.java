@@ -18,6 +18,11 @@
 
 package xyz.yawek.banking.controller;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -52,6 +57,17 @@ public class AuthController {
     private final RefreshTokenService refreshTokenService;
 
     @SuppressWarnings("unused")
+    @Operation(summary = "Register a user")
+    @ApiResponses({
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "User registered",
+                    content = @Content),
+            @ApiResponse(
+                    responseCode = "409",
+                    description = "Email already taken",
+                    content = @Content)
+    })
     @PostMapping("/register")
     public ResponseEntity<?> register(@RequestBody @Valid UserRequest userRequest) {
         User user = userService.buildFromRequest(userRequest);
@@ -61,6 +77,18 @@ public class AuthController {
     }
 
     @SuppressWarnings("unused")
+    @Operation(summary = "Login a user")
+    @ApiResponses({
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "User logged",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = TokenResponse.class))
+            ),
+            @ApiResponse(responseCode = "404", description = "User not found", content = @Content),
+            @ApiResponse(responseCode = "401", description = "Wrong credentials", content = @Content)
+    })
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody @Valid UserRequest userRequest) {
         try {
@@ -78,6 +106,17 @@ public class AuthController {
     }
 
     @SuppressWarnings("unused")
+    @Operation(summary = "Create new tokens using current refresh token")
+    @ApiResponses({
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "Tokens refreshed",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = TokenResponse.class))
+            ),
+            @ApiResponse(responseCode = "400", description = "Bad/expired token", content = @Content)
+    })
     @PostMapping("/refresh-token")
     public ResponseEntity<?> refreshToken(
             @RequestBody @Valid RefreshTokenRequest refreshTokenRequest) {
