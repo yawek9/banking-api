@@ -22,6 +22,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -43,7 +44,8 @@ import xyz.yawek.banking.service.UserService;
 import javax.validation.Valid;
 
 @RestController
-@RequestMapping("/payment")
+@RequestMapping(value = "/payment", produces = {"application/json"})
+@SecurityRequirement(name = "Bearer Authentication")
 @RequiredArgsConstructor
 public class PaymentController {
 
@@ -54,13 +56,20 @@ public class PaymentController {
     @Operation(summary = "Send payment")
     @ApiResponses({
             @ApiResponse(
+                    responseCode = "200",
+                    description = "Payment sent",
+                    content = @Content
+            ),
+            @ApiResponse(
                     responseCode = "400",
                     description = "Not enough balance",
-                    content = @Content),
+                    content = @Content
+            ),
             @ApiResponse(
                     responseCode = "401",
                     description = "User did not send token or sent token is expired",
-                    content = @Content)
+                    content = @Content
+            )
     })
     @PostMapping("/pay")
     @PreAuthorize("hasAuthority('USER')")
@@ -75,15 +84,18 @@ public class PaymentController {
     }
 
     @SuppressWarnings("unused")
-    @Operation(summary = "Get all user's received and sent payments")
+    @Operation(summary = "Get user's received and sent payments")
     @ApiResponses({
             @ApiResponse(
                     responseCode = "200",
-                    description = "Loans"),
+                    description = "Payments data",
+                    useReturnTypeSchema = true
+            ),
             @ApiResponse(
                     responseCode = "401",
                     description = "User did not send token or sent token is expired",
-                    content = @Content)
+                    content = @Content
+            )
     })
     @GetMapping("/payments")
     @PreAuthorize("hasAuthority('USER')")

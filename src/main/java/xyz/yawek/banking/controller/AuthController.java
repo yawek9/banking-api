@@ -47,7 +47,7 @@ import java.util.Optional;
 import java.util.Set;
 
 @RestController
-@RequestMapping("/auth")
+@RequestMapping(value = "/auth", produces = {"application/json"})
 @RequiredArgsConstructor
 public class AuthController {
 
@@ -62,6 +62,10 @@ public class AuthController {
             @ApiResponse(
                     responseCode = "200",
                     description = "User registered",
+                    content = @Content),
+            @ApiResponse(
+                    responseCode = "400",
+                    description = "Wrong credentials format",
                     content = @Content),
             @ApiResponse(
                     responseCode = "409",
@@ -86,8 +90,18 @@ public class AuthController {
                             mediaType = "application/json",
                             schema = @Schema(implementation = TokenResponse.class))
             ),
-            @ApiResponse(responseCode = "404", description = "User not found", content = @Content),
-            @ApiResponse(responseCode = "401", description = "Wrong credentials", content = @Content)
+            @ApiResponse(
+                    responseCode = "400",
+                    description = "Wrong credentials format", content = @Content
+            ),
+            @ApiResponse(
+                    responseCode = "404",
+                    description = "User not found", content = @Content
+            ),
+            @ApiResponse(
+                    responseCode = "401",
+                    description = "Wrong credentials", content = @Content
+            )
     })
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody @Valid UserRequest userRequest) {

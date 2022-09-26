@@ -22,6 +22,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -43,7 +44,8 @@ import xyz.yawek.banking.service.UserService;
 import javax.validation.Valid;
 
 @RestController
-@RequestMapping("/loan")
+@RequestMapping(value = "/loan", produces = {"application/json"})
+@SecurityRequirement(name = "Bearer Authentication")
 @RequiredArgsConstructor
 public class LoanController {
 
@@ -72,11 +74,12 @@ public class LoanController {
     }
 
     @SuppressWarnings("unused")
-    @Operation(summary = "Get all user's loans")
+    @Operation(summary = "Get user's loans")
     @ApiResponses({
             @ApiResponse(
                     responseCode = "200",
-                    description = "Loans"),
+                    description = "Loans data",
+                    useReturnTypeSchema = true),
             @ApiResponse(
                     responseCode = "401",
                     description = "User did not send token or sent token is expired",

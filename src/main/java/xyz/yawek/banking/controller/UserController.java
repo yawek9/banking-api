@@ -20,8 +20,10 @@ package xyz.yawek.banking.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -33,8 +35,11 @@ import org.springframework.web.bind.annotation.RestController;
 import xyz.yawek.banking.model.User;
 import xyz.yawek.banking.service.UserService;
 
+import java.math.BigDecimal;
+
 @RestController
-@RequestMapping("/user")
+@RequestMapping(value = "/user", produces = {"application/json"})
+@SecurityRequirement(name = "Bearer Authentication")
 @RequiredArgsConstructor
 public class UserController {
 
@@ -44,9 +49,15 @@ public class UserController {
     @Operation(summary = "Get user's balance")
     @ApiResponses({
             @ApiResponse(
+                    responseCode = "200",
+                    description = "Account balance",
+                    content = @Content(schema = @Schema(implementation = BigDecimal.class))
+            ),
+            @ApiResponse(
                     responseCode = "401",
                     description = "User did not send token or sent token is expired",
-                    content = @Content)
+                    content = @Content
+            )
     })
     @GetMapping("/balance")
     @PreAuthorize("hasAuthority('USER')")
