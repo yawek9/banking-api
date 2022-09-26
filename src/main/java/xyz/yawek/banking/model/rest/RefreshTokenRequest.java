@@ -20,7 +20,9 @@ package xyz.yawek.banking.model.rest;
 
 import lombok.Data;
 
+import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.Size;
 
 @Data
 public class RefreshTokenRequest {
@@ -29,6 +31,8 @@ public class RefreshTokenRequest {
     private String refreshToken;
 
     @NotBlank
+    @Email(regexp = ".+@.+\\..+")
+    @Size(min = 3, max = 254)
     private String email;
 
 }

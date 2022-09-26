@@ -23,8 +23,10 @@ import lombok.Data;
 
 import javax.validation.constraints.DecimalMin;
 import javax.validation.constraints.Digits;
+import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
 import java.math.BigDecimal;
 
 @Data
@@ -32,6 +34,8 @@ public class PaymentRequest {
 
     @JsonProperty(value = "receiver")
     @NotBlank
+    @Email(regexp = ".+@.+\\..+")
+    @Size(min = 3, max = 254)
     private String receiverEmail;
 
     @Digits(integer = 20, fraction = 2)

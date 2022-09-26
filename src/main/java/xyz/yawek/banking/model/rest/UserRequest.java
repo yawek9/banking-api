@@ -31,10 +31,11 @@ public class UserRequest {
 
     @NotBlank
     @Email(regexp = ".+@.+\\..+")
+    @Size(min = 3, max = 254)
     private String email;
 
     @NotBlank
-    @Size(min = 6)
+    @Size(min = 6, max = 50)
     private String password;
 
 }
